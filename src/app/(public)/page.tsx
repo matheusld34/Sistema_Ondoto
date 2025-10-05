@@ -1,5 +1,7 @@
+import { Footer } from "./_components/footer";
 import { Header } from "./_components/header";
 import { Hero } from "./_components/hero";
+import { Profissionais } from "./_components/profissionais";
 
 
 export default function Home() {
@@ -8,7 +10,10 @@ export default function Home() {
       <Header />
       <div>
         <Hero />
+        <Profissionais />
+
       </div>
+      <Footer />
 
     </div>
   )
