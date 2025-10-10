@@ -46,10 +46,7 @@ export function SidebarDashboard
                             alt="Logo do odontopro"
                             priority
                             quality={100}
-                            style={{
-                                width: 'auto',
-                                height: 'auto',
-                            }}
+
                         />
                     )}
                 </div>
@@ -57,6 +54,40 @@ export function SidebarDashboard
                 <Button className='bg-gray-100 hover:bg-gray-50 text-zinc-900 self-end mb-2' onClick={() => setIsCollapsed(!isCollapsed)}>
                     {!isCollapsed ? <ChevronLeft className="h-12 w-12" /> : <ChevronRight className="h-12 w-12" />}
                 </Button>
+                {isCollapsed && (
+                    <nav className="flex flex-col gap-1 overflow-hidden mt-2">
+                        <SidebarLink
+                            href="/dashboard"
+                            label="Agendamentos"
+                            pathname={pathname}
+                            isCollapsed={isCollapsed}
+                            icon={<CalendarCheck2 className="h-6 w-6" />}
+                        />
+                        <SidebarLink
+                            href="/dashboard/services"
+                            label="Serviços"
+                            pathname={pathname}
+                            isCollapsed={isCollapsed}
+                            icon={<Folder className="h-6 w-6" />}
+                        />
+                        <SidebarLink
+                            href="/dashboard/services"
+                            label="Serviços"
+                            pathname={pathname}
+                            isCollapsed={isCollapsed}
+                            icon={<Folder className="h-6 w-6" />}
+                        />
+                        <SidebarLink
+                            href="/dashboard/plans"
+                            label="Planos"
+                            pathname={pathname}
+                            isCollapsed={isCollapsed}
+                            icon={<Banknote className="h-6 w-6" />}
+                        />
+
+
+                    </nav>
+                )}
 
                 <Collapsible open={!isCollapsed}>
                     <CollapsibleContent>
