@@ -1,5 +1,12 @@
 
-export default function Dashboard() {
+import getSesion from '@/lib/getSession';
+import { redirect } from 'next/navigation';
+
+export default async function Dashboard() {
+    const session = getSesion()
+    if (!session) {
+        redirect("/")
+    }
     return (
         <div>
             <h1> Dashboard</h1>

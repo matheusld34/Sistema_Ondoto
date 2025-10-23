@@ -15,7 +15,7 @@ import {
 import { Button } from "@/components/ui/button"
 import { Banknote, CalendarCheck2, ChevronLeft, ChevronRight, Folder, List, Settings } from "lucide-react"
 import Link from "next/link"
-import logoImg from '../../../../../assets/logo-odonto.png'
+import logoImg from '../../../../../public/logo-odonto.png'
 import Image from "next/image"
 
 import {
@@ -147,7 +147,7 @@ export function SidebarDashboard
                     <Sheet>
                         <div className="flex items-center gap-4">
                             <SheetTrigger asChild>
-                                <Button variant="outline" size="icon" className="md:hidden">
+                                <Button variant="outline" size="icon" className="md:hidden" onClick={() => setIsCollapsed(false)}>
                                     <List className="h-5 w-5" />
                                 </Button>
                             </SheetTrigger>
