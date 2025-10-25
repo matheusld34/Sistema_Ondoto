@@ -1,4 +1,5 @@
 "use client"
+import { useState } from "react";
 import { useProfileForm } from "./profile-form"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
@@ -12,11 +13,48 @@ import {
 } from "@/components/ui/select"
 import Image from "next/image"
 import imgTest from "../../../../../../public/foto1.png"
+import { Label } from "@/components/ui/label";
+
+import {
+    Dialog,
+    DialogContent,
+    DialogDescription,
+    DialogHeader,
+    DialogTitle,
+    DialogTrigger,
+} from "@/components/ui/dialog"
+
+import { Button } from "@/components/ui/button";
+import { Arrow } from "@radix-ui/react-select";
+import { ArrowRight } from "lucide-react";
+import { cn } from "@/lib/utils";
+
 
 
 export function ProfileContent() {
 
+    const [selectedHours, setSelectedHours] = useState<string[]>([])
+
     const form = useProfileForm();
+
+    function generateTimeSlots() {
+        const hours: string[] = [];
+        for (let i = 0; i <= 24; i++) {
+            for (let j = 0; j < 2; j++) {
+                const hour = i.toString().padStart(2, "0")
+                const minute = (j * 30).toString().padStart(2, "0")
+                hours.push(`${hour}:${minute}`)
+            }
+        }
+        return hours;
+    }
+
+    const hours = generateTimeSlots();
+
+    function toggleHour(hour: string) {
+        setSelectedHours((prev) => prev.includes(hour) ? prev.filter(h => h !== hour) : [...prev, hour].sort())
+    }
+
 
     return (
         <div className="mx-auto">
@@ -48,6 +86,7 @@ export function ProfileContent() {
                                             <FormControl>
                                                 <Input {...field} placeholder="Digite o nome da clinica..." />
                                             </FormControl>
+                                            <FormMessage />
                                         </FormItem>
 
                                     )}
@@ -62,6 +101,7 @@ export function ProfileContent() {
                                             <FormControl>
                                                 <Input {...field} placeholder="Digite o endereço da clinica..." />
                                             </FormControl>
+                                            <FormMessage />
                                         </FormItem>
 
                                     )}
@@ -76,6 +116,7 @@ export function ProfileContent() {
                                             <FormControl>
                                                 <Input {...field} placeholder="Digite o telefone..." />
                                             </FormControl>
+                                            <FormMessage />
                                         </FormItem>
 
                                     )}
@@ -102,6 +143,46 @@ export function ProfileContent() {
 
                                     )}
                                 />
+                                <div className="space-y-2">
+                                    <Label className="font-semibold">
+                                        Configurar Horario da clinica
+                                    </Label>
+                                    <Dialog>
+                                        <DialogTrigger asChild>
+                                            <Button variant="outline" className="w-full justify-between">
+                                                Clique aqui para selecionar horários
+                                                <ArrowRight className="w-5 h-5" />
+                                            </Button>
+                                        </DialogTrigger>
+                                        <DialogContent>
+                                            <DialogHeader>
+                                                <DialogTitle>Horários da clínica</DialogTitle>
+                                                <DialogDescription>
+                                                    Selecione abaixo os horários de funcionamento da clínica:
+                                                </DialogDescription>
+                                            </DialogHeader>
+                                            <section className="py-4">
+                                                <p className="text-sm text-muted-foreground mb-2">Clique nos horários abaixo para marcar ou desmarcar: </p>
+
+                                                <div className="grid grid-cols-5 gap-2">
+                                                    {hours.map((hour) => (
+                                                        <Button
+                                                            key={hour}
+                                                            variant="outline"
+                                                            className={cn('border-2', selectedHours.includes(hour) && ' border-2 border-emerald-500 text-primary')}
+                                                            onClick={() => toggleHour(hour)}
+                                                        >
+                                                            {hour}
+                                                        </Button>
+                                                    ))}
+                                                </div>
+
+                                            </section>
+                                        </DialogContent>
+                                    </Dialog>
+
+
+                                </div>
 
                             </div>
 
