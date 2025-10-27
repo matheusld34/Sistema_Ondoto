@@ -1,6 +1,6 @@
 "use client"
 import { useState } from "react";
-import { useProfileForm } from "./profile-form"
+import { ProfileFormData, useProfileForm } from "./profile-form"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
@@ -67,11 +67,17 @@ export function ProfileContent() {
         zone.startsWith("America/Boa_Vista")
     );
 
+    async function onSubmit(values: ProfileFormData) {
+        const profileData = {
+            ...values,
+            times: selectedHours
+        }
+    }
 
     return (
         <div className="mx-auto">
             <Form {...form}>
-                <form>
+                <form onSubmit={form.handleSubmit(onSubmit)}>
                     <Card>
                         <CardHeader>
                             <CardTitle>Perfil</CardTitle>
