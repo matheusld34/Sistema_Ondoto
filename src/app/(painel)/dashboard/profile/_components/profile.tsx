@@ -25,18 +25,46 @@ import {
 } from "@/components/ui/dialog"
 
 import { Button } from "@/components/ui/button";
-import { Arrow } from "@radix-ui/react-select";
+
 import { ArrowRight } from "lucide-react";
 import { cn } from "@/lib/utils";
+// Subscription type from Prisma is not available here; define a minimal local type instead.
+type LocalSubscription = {
+    id?: string | null;
+    // add other fields from your Prisma schema if needed
+};
+
+type UserBase = {
+    id?: string | null;
+    name?: string | null;
+    address?: string | null;
+    phone?: string | null;
+    status?: boolean | null;
+    times?: string[] | null;
+    timeZone?: string | null;
+};
+
+type UserWithSubscription = UserBase & { subscription: LocalSubscription | null }
+
+interface ProfileContentProps {
+    user: UserWithSubscription;
+}
 
 
 
-export function ProfileContent() {
+export function ProfileContent({ user }: ProfileContentProps) {
 
-    const [selectedHours, setSelectedHours] = useState<string[]>([])
+    const [selectedHours, setSelectedHours] = useState<string[]>(user.times ?? [])
     const [dialogIsOpen, setDialogIsOpen] = useState(false);
 
-    const form = useProfileForm();
+    const form = useProfileForm({
+        name: user.name ?? null,
+        address: user.address ?? null,
+        phone: user.phone ?? null,
+        status: user.status ?? false,
+        timeZone: user.timeZone ?? null,
+    });
+
 
     function generateTimeSlots() {
         const hours: string[] = [];
