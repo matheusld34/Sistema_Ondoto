@@ -28,6 +28,9 @@ import { Button } from "@/components/ui/button";
 
 import { ArrowRight } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { updateProfile } from '../_actions/update-profile'
+import { toast } from 'sonner'
+import { formatPhone } from '@/utils/formatPhone'
 // Subscription type from Prisma is not available here; define a minimal local type instead.
 type LocalSubscription = {
     id?: string | null;
@@ -42,6 +45,7 @@ type UserBase = {
     status?: boolean | null;
     times?: string[] | null;
     timeZone?: string | null;
+    image?: string | null;
 };
 
 type UserWithSubscription = UserBase & { subscription: LocalSubscription | null }
@@ -102,39 +106,43 @@ export function ProfileContent({ user }: ProfileContentProps) {
         }
     }
 
+
+
     return (
-        <div className="mx-auto">
+        <div className='mx-auto'>
             <Form {...form}>
                 <form onSubmit={form.handleSubmit(onSubmit)}>
                     <Card>
                         <CardHeader>
-                            <CardTitle>Perfil</CardTitle>
+                            <CardTitle>Meu Perfil</CardTitle>
                         </CardHeader>
-                        <CardContent className="space-y-6">
-                            <div className="flex justify-center">
-                                <div className="bg-gray-200 relative h-40 w-40 rounded-full overflow-hidden">
+                        <CardContent className='space-y-6'>
+                            <div className='flex justify-center'>
+                                <div className='bg-gray-200 relative h-40 w-40 rounded-full overflow-hidden'>
                                     <Image
-                                        src={imgTest}
-                                        alt="Foto de perfil"
+                                        src={user.image ? user.image : imgTest}
+                                        alt="Foto da clinica"
                                         fill
-                                        className="object-cover"
+                                        className='object-cover'
                                     />
                                 </div>
-
                             </div>
-                            <div className="space-y-4">
+
+                            <div className='space-y-4'>
                                 <FormField
                                     control={form.control}
                                     name="name"
                                     render={({ field }) => (
                                         <FormItem>
-                                            <FormLabel className="font-semibold">Nome Completo</FormLabel>
+                                            <FormLabel className='font-semibold'>Nome completo</FormLabel>
                                             <FormControl>
-                                                <Input {...field} placeholder="Digite o nome da clinica..." />
+                                                <Input
+                                                    {...field}
+                                                    placeholder='Digite o nome da clinica...'
+                                                />
                                             </FormControl>
                                             <FormMessage />
                                         </FormItem>
-
                                     )}
                                 />
 
@@ -143,28 +151,41 @@ export function ProfileContent({ user }: ProfileContentProps) {
                                     name="address"
                                     render={({ field }) => (
                                         <FormItem>
-                                            <FormLabel className="font-semibold">Endereço Completo:</FormLabel>
+                                            <FormLabel className='font-semibold'>
+                                                Endereço completo:
+                                            </FormLabel>
                                             <FormControl>
-                                                <Input {...field} placeholder="Digite o endereço da clinica..." />
+                                                <Input
+                                                    {...field}
+                                                    placeholder='Digite o endereço da clinica...'
+                                                />
                                             </FormControl>
                                             <FormMessage />
                                         </FormItem>
-
                                     )}
                                 />
+
 
                                 <FormField
                                     control={form.control}
                                     name="phone"
                                     render={({ field }) => (
                                         <FormItem>
-                                            <FormLabel className="font-semibold">Telefone</FormLabel>
+                                            <FormLabel className='font-semibold'>
+                                                Telefone
+                                            </FormLabel>
                                             <FormControl>
-                                                <Input {...field} placeholder="Digite o telefone..." />
+                                                <Input
+                                                    {...field}
+                                                    placeholder='(67) 99912-3456'
+                                                    onChange={(e) => {
+                                                        const formattedValue = formatPhone(e.target.value)
+                                                        field.onChange(formattedValue)
+                                                    }}
+                                                />
                                             </FormControl>
                                             <FormMessage />
                                         </FormItem>
-
                                     )}
                                 />
 
@@ -173,49 +194,61 @@ export function ProfileContent({ user }: ProfileContentProps) {
                                     name="status"
                                     render={({ field }) => (
                                         <FormItem>
-                                            <FormLabel className="font-semibold">Status da clinica</FormLabel>
+                                            <FormLabel className='font-semibold'>
+                                                Status da clinica
+                                            </FormLabel>
                                             <FormControl>
-                                                <Select onValueChange={field.onChange} defaultValue={field.value ? "active" : "inactive"}>
+
+                                                <Select
+                                                    onValueChange={field.onChange}
+                                                    defaultValue={field.value ? "active" : "inactive"}
+                                                >
                                                     <SelectTrigger>
-                                                        <SelectValue placeholder="Selecione o status da clinica" {...field} />
+                                                        <SelectValue placeholder="Selecione o status da clincia" />
                                                     </SelectTrigger>
                                                     <SelectContent>
-                                                        <SelectItem value="active">Ativo (clinica aberta)</SelectItem>
-                                                        <SelectItem value="inactive">Inativo (clinica fechada)</SelectItem>
+                                                        <SelectItem value="active">ATIVO (clinica aberta)</SelectItem>
+                                                        <SelectItem value="inactive">INATIVO (clinica fechada)</SelectItem>
                                                     </SelectContent>
                                                 </Select>
+
                                             </FormControl>
                                         </FormItem>
-
                                     )}
                                 />
-                                <div className="space-y-2">
-                                    <Label className="font-semibold">
-                                        Configurar Horario da clinica
+
+                                <div className='space-y-2'>
+                                    <Label className='font-semibold'>
+                                        Configurar horários da clinica
                                     </Label>
-                                    <Dialog open={dialogIsOpen} onOpenChange={setDialogIsOpen}>
+
+                                    <Dialog open={dialogIsOpen} onOpenChange={setDialogIsOpen} >
                                         <DialogTrigger asChild>
-                                            <Button variant="outline" className="w-full justify-between">
+                                            <Button variant="outline" className='w-full justify-between'>
                                                 Clique aqui para selecionar horários
-                                                <ArrowRight className="w-5 h-5" />
+                                                <ArrowRight className='w-5 h-5' />
                                             </Button>
                                         </DialogTrigger>
+
                                         <DialogContent>
                                             <DialogHeader>
-                                                <DialogTitle>Horários da clínica</DialogTitle>
+                                                <DialogTitle>Horários da clinica</DialogTitle>
                                                 <DialogDescription>
-                                                    Selecione abaixo os horários de funcionamento da clínica:
+                                                    Selecione abaixo os horários de funcionamento da clinica:
                                                 </DialogDescription>
                                             </DialogHeader>
-                                            <section className="py-4">
-                                                <p className="text-sm text-muted-foreground mb-2">Clique nos horários abaixo para marcar ou desmarcar: </p>
 
-                                                <div className="grid grid-cols-5 gap-2">
+                                            <section className='py-4'>
+                                                <p className='text-sm text-muted-foreground mb-2'>
+                                                    Clique nos horários abaixo para marcar ou desmcar:
+                                                </p>
+
+                                                <div className='grid grid-cols-5 gap-2'>
                                                     {hours.map((hour) => (
                                                         <Button
                                                             key={hour}
                                                             variant="outline"
-                                                            className={cn('border-2', selectedHours.includes(hour) && ' border-2 border-emerald-500 text-primary')}
+                                                            className={cn('h-10', selectedHours.includes(hour) && 'border-2 border-emerald-500 text-primary')}
                                                             onClick={() => toggleHour(hour)}
                                                         >
                                                             {hour}
@@ -223,51 +256,63 @@ export function ProfileContent({ user }: ProfileContentProps) {
                                                     ))}
                                                 </div>
 
-                                            </section>
-                                            <Button className="w-full" onClick={() => setDialogIsOpen(false)}>
+                                            </section >
+
+                                            <Button
+                                                className='w-full'
+                                                onClick={() => setDialogIsOpen(false)}
+                                            >
                                                 Fechar modal
                                             </Button>
+
                                         </DialogContent>
                                     </Dialog>
 
-
                                 </div>
+
 
                                 <FormField
                                     control={form.control}
                                     name="timeZone"
                                     render={({ field }) => (
                                         <FormItem>
-                                            <FormLabel className="font-semibold">Selecione o fuso horário</FormLabel>
+                                            <FormLabel className='font-semibold'>
+                                                Selecione o fuso horário
+                                            </FormLabel>
                                             <FormControl>
-                                                <Select onValueChange={field.onChange} defaultValue={field.value ? "active" : "inactive"}>
+
+                                                <Select
+                                                    onValueChange={field.onChange}
+                                                    defaultValue={field.value}
+                                                >
                                                     <SelectTrigger>
-                                                        <SelectValue placeholder="Selecione o seu fuso horário" {...field} />
+                                                        <SelectValue placeholder="Selecione o seu fuso horário" />
                                                     </SelectTrigger>
                                                     <SelectContent>
-                                                        {timeZones.map((zone =>
-                                                            <SelectItem key={zone} value={zone}>{zone}</SelectItem>
+                                                        {timeZones.map((zone) => (
+                                                            <SelectItem key={zone} value={zone}>
+                                                                {zone}
+                                                            </SelectItem>
                                                         ))}
                                                     </SelectContent>
                                                 </Select>
+
                                             </FormControl>
                                         </FormItem>
-
                                     )}
                                 />
 
-                                <Button type="submit"
-                                    className="w-full bg-emerald-500 hover:bg-emerald-400 text-white"
+                                <Button
+                                    type="submit"
+                                    className='w-full bg-emerald-500 hover:bg-emerald-400'
                                 >
                                     Salvar alterações
                                 </Button>
 
                             </div>
-
                         </CardContent>
                     </Card>
                 </form>
-
             </Form>
         </div>
     )
