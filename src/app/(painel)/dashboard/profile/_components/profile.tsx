@@ -31,55 +31,44 @@ import { cn } from "@/lib/utils";
 import { updateProfile } from '../_actions/update-profile'
 import { toast } from 'sonner'
 import { formatPhone } from '@/utils/formatPhone'
-// Subscription type from Prisma is not available here; define a minimal local type instead.
-type LocalSubscription = {
-    id?: string | null;
-    // add other fields from your Prisma schema if needed
-};
+import { Prisma } from "@/generated/prisma";
 
-type UserBase = {
-    id?: string | null;
-    name?: string | null;
-    address?: string | null;
-    phone?: string | null;
-    status?: boolean | null;
-    times?: string[] | null;
-    timeZone?: string | null;
-    image?: string | null;
-};
-
-type UserWithSubscription = UserBase & { subscription: LocalSubscription | null }
+type UserWithSubscription = Prisma.UserGetPayload<{
+    include: {
+        subscription: true
+    }
+}>
 
 interface ProfileContentProps {
     user: UserWithSubscription;
 }
 
-
-
 export function ProfileContent({ user }: ProfileContentProps) {
-
     const [selectedHours, setSelectedHours] = useState<string[]>(user.times ?? [])
     const [dialogIsOpen, setDialogIsOpen] = useState(false);
 
     const form = useProfileForm({
-        name: user.name ?? null,
-        address: user.address ?? null,
-        phone: user.phone ?? null,
-        status: user.status ?? false,
-        timeZone: user.timeZone ?? null,
+        name: user.name,
+        address: user.address,
+        phone: user.phone,
+        status: user.status,
+        timeZone: user.timeZone
     });
 
 
-    function generateTimeSlots() {
+    function generateTimeSlots(): string[] {
         const hours: string[] = [];
-        for (let i = 0; i <= 24; i++) {
+
+        for (let i = 8; i <= 24; i++) {
             for (let j = 0; j < 2; j++) {
                 const hour = i.toString().padStart(2, "0")
                 const minute = (j * 30).toString().padStart(2, "0")
                 hours.push(`${hour}:${minute}`)
             }
         }
+
         return hours;
+
     }
 
     const hours = generateTimeSlots();
@@ -88,7 +77,7 @@ export function ProfileContent({ user }: ProfileContentProps) {
         setSelectedHours((prev) => prev.includes(hour) ? prev.filter(h => h !== hour) : [...prev, hour].sort())
     }
 
-    const timeZones = Intl.supportedValuesOf('timeZone').filter((zone) =>
+    const timeZones = Intl.supportedValuesOf("timeZone").filter((zone) =>
         zone.startsWith("America/Sao_Paulo") ||
         zone.startsWith("America/Fortaleza") ||
         zone.startsWith("America/Recife") ||
@@ -100,12 +89,22 @@ export function ProfileContent({ user }: ProfileContentProps) {
     );
 
     async function onSubmit(values: ProfileFormData) {
-        const profileData = {
-            ...values,
-            times: selectedHours
-        }
-    }
+        const response = await updateProfile({
+            name: values.name,
+            address: values.address,
+            status: values.status === 'active' ? true : false,
+            phone: values.phone,
+            timeZone: values.timeZone,
+            times: selectedHours || []
+        })
 
+        if (response.error) {
+            toast.error(response.error)
+            return;
+        }
+
+        toast.success(response.data)
+    }
 
 
     return (
