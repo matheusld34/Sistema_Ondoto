@@ -43,6 +43,7 @@ interface ProfileContentProps {
     user: UserWithSubscription;
 }
 
+
 export function ProfileContent({ user }: ProfileContentProps) {
     const [selectedHours, setSelectedHours] = useState<string[]>(user.times ?? [])
     const [dialogIsOpen, setDialogIsOpen] = useState(false);
