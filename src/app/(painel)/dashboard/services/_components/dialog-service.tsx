@@ -1,7 +1,7 @@
 "use client"
 
 import { DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog"
-import { useDialogServiceForm } from "./dialog-service-form"
+import { useDialogServiceForm, DialogServiceFormData } from "./dialog-service-form"
 import {
     Form,
     FormControl,
@@ -16,6 +16,9 @@ import { Button } from '@/components/ui/button'
 export function DialogService() {
 
     const form = useDialogServiceForm()
+    async function onSubmit(values: DialogServiceFormData) {
+
+    }
 
     return (
         <>
