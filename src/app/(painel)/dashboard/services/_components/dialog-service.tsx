@@ -15,7 +15,7 @@ import {
 } from '@/components/ui/form'
 import { Input } from '@/components/ui/input'
 import { Button } from '@/components/ui/button'
-
+import { convertRealToCents } from "@/utils/convertCurrency"
 export function DialogService() {
 
     const form = useDialogServiceForm()
@@ -23,7 +23,8 @@ export function DialogService() {
 
     async function onSubmit(values: DialogServiceFormData) {
 
-        console.log(values)
+        const priceInCents = convertRealToCents(values.price);
+
     }
 
 
