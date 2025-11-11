@@ -17,13 +17,23 @@ import { Input } from '@/components/ui/input'
 import { Button } from '@/components/ui/button'
 import { convertRealToCents } from "@/utils/convertCurrency"
 import { createNewService } from '../_actions/create-service'
-export function DialogService() {
+import { toast } from "sonner"
+import { set } from "zod"
+import { useState } from "react"
+
+interface DialogServiceProps {
+    closeModal: () => void;
+}
+
+
+export function DialogService({ closeModal }: DialogServiceProps) {
 
     const form = useDialogServiceForm()
+    const [loading, setLoading] = useState(false)
 
 
     async function onSubmit(values: DialogServiceFormData) {
-
+        setLoading(true);
         const priceInCents = convertRealToCents(values.price);
         const hours = parseInt(values.hours) || 0;
         const minutes = parseInt(values.minutes) || 0;
@@ -36,6 +46,15 @@ export function DialogService() {
             price: priceInCents,
             duration: duration,
         });
+
+        setLoading(false);
+
+        if (response.error) {
+            toast.error(response.error)
+            return;
+        }
+
+        toast.success("Serviço cadastrado com sucesso!")
 
     }
 
@@ -158,8 +177,8 @@ export function DialogService() {
                         />
                     </div>
 
-                    <Button type="submit" className="w-full font-semibold text-white">
-                        Adicionar serviço
+                    <Button type="submit" className="w-full font-semibold text-white" disabled={loading}>
+                        {loading ? "cadastrando..." : "Adicionar serviço"}
                     </Button>
 
                 </form>
