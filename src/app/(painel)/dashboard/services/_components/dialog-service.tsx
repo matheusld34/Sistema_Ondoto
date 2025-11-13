@@ -1,8 +1,5 @@
 "use client"
-
-// - Valor em centavos = Valor em reais * 100
-// - Valor em reais = Valor em centavos / 100
-
+import { useState } from 'react'
 import { DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog"
 import { useDialogServiceForm, DialogServiceFormData } from "./dialog-service-form"
 import {
@@ -15,47 +12,55 @@ import {
 } from '@/components/ui/form'
 import { Input } from '@/components/ui/input'
 import { Button } from '@/components/ui/button'
-import { convertRealToCents } from "@/utils/convertCurrency"
+import { convertRealToCents } from '@/utils/convertCurrency'
 import { createNewService } from '../_actions/create-service'
 import { toast } from "sonner"
-import { set } from "zod"
-import { useState } from "react"
+import { useRouter } from 'next/navigation'
 
 interface DialogServiceProps {
     closeModal: () => void;
 }
 
-
 export function DialogService({ closeModal }: DialogServiceProps) {
 
     const form = useDialogServiceForm()
-    const [loading, setLoading] = useState(false)
+    const [loading, setLoading] = useState(false);
+    const router = useRouter();
 
 
     async function onSubmit(values: DialogServiceFormData) {
         setLoading(true);
-        const priceInCents = convertRealToCents(values.price);
+        const priceInCents = convertRealToCents(values.price)
         const hours = parseInt(values.hours) || 0;
         const minutes = parseInt(values.minutes) || 0;
 
-        //conerter as horas e minutos para duração total em minutos
-
+        // Converter as horas e minutos para duração total em minutos;
         const duration = (hours * 60) + minutes;
+
         const response = await createNewService({
             name: values.name,
             price: priceInCents,
-            duration: duration,
-        });
+            duration: duration
+        })
 
         setLoading(false);
+
 
         if (response.error) {
             toast.error(response.error)
             return;
         }
 
-        toast.success("Serviço cadastrado com sucesso!")
+        toast.success("Serviço cadastrado com sucesso")
+        handleCloseModal();
+        router.refresh();
 
+    }
+
+
+    function handleCloseModal() {
+        form.reset();
+        closeModal();
     }
 
 
@@ -177,8 +182,12 @@ export function DialogService({ closeModal }: DialogServiceProps) {
                         />
                     </div>
 
-                    <Button type="submit" className="w-full font-semibold text-white" disabled={loading}>
-                        {loading ? "cadastrando..." : "Adicionar serviço"}
+                    <Button
+                        type="submit"
+                        className="w-full font-semibold text-white"
+                        disabled={loading}
+                    >
+                        {loading ? "Cadastrando..." : "Adicionar serviço"}
                     </Button>
 
                 </form>
