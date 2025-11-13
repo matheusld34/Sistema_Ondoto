@@ -1,4 +1,4 @@
-import { PrismaClient } from '@prisma/client'
+import { PrismaClient } from "../generated/prisma/client"
 
 let prisma: PrismaClient;
 
@@ -16,4 +16,4 @@ if (process.env.NODE_ENV === 'production') {
     prisma = globalWithPrisma.prisma;
 }
 
-export default prisma;
+export default prisma
