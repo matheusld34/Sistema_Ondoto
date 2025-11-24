@@ -44,7 +44,7 @@ export function ServicesList({ services }: ServicesListProps) {
 
         if (response.error) {
             toast(response.error)
-            return; priceInCents
+            return;
         }
 
         toast.success(response.data)
@@ -86,8 +86,8 @@ export function ServicesList({ services }: ServicesListProps) {
                                 initialValues={editingService ? {
                                     name: editingService.name,
                                     price: (editingService.price / 100).toFixed(2).replace(".", ','),
-                                    hours: Math.floor(editingService.duration / 60).toString(),
-                                    minutes: (editingService.duration % 60).toString()
+                                    hours: Math.floor((editingService.duration ?? 0) / 60).toString(),
+                                    minutes: ((editingService.duration ?? 0) % 60).toString()
                                 } : undefined}
                             />
                         </DialogContent>

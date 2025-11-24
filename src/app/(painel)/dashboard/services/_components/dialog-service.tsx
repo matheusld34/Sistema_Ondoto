@@ -14,6 +14,7 @@ import { Input } from '@/components/ui/input'
 import { Button } from '@/components/ui/button'
 import { convertRealToCents } from '@/utils/convertCurrency'
 import { createNewService } from '../_actions/create-service'
+import { updateService } from '../_actions/update-service'
 import { toast } from "sonner"
 import { useRouter } from 'next/navigation'
 import { init } from 'next/dist/compiled/webpack/webpack'
@@ -31,7 +32,7 @@ interface DialogServiceProps {
 
 export function DialogService({ closeModal, initialValues, serviceId }: DialogServiceProps) {
 
-    const form = useDialogServiceForm({ initialValues: initialValues });
+    const form = useDialogServiceForm({ initialValues: initialValues })
     const [loading, setLoading] = useState(false);
     const router = useRouter();
 
@@ -44,6 +45,7 @@ export function DialogService({ closeModal, initialValues, serviceId }: DialogSe
 
         // Converter as horas e minutos para duração total em minutos;
         const duration = (hours * 60) + minutes;
+
         if (serviceId) {
             await editServiceById({
                 serviceId: serviceId,
@@ -51,7 +53,6 @@ export function DialogService({ closeModal, initialValues, serviceId }: DialogSe
                 priceInCents: priceInCents,
                 duration: duration
             })
-            setLoading(false);
 
             return;
         }
@@ -64,6 +65,10 @@ export function DialogService({ closeModal, initialValues, serviceId }: DialogSe
 
         setLoading(false);
 
+        if (!response) {
+            toast.error("Erro ao criar o serviço")
+            return;
+        }
 
         if (response.error) {
             toast.error(response.error)
@@ -76,13 +81,38 @@ export function DialogService({ closeModal, initialValues, serviceId }: DialogSe
 
     }
 
-    async function editServiceById({ serviceId, name, priceInCents, duration }: {
-        serviceId: string,
-        name: string,
-        priceInCents: number,
-        duration: number
-    }) {
-        console.log("editando serviço...")
+
+    async function editServiceById({
+        serviceId,
+        name,
+        priceInCents,
+        duration }: {
+            serviceId: string,
+            name: string,
+            priceInCents: number,
+            duration: number
+        }) {
+
+        const response = await updateService({
+            serviceId: serviceId,
+            name: name,
+            price: priceInCents,
+            duration: duration
+        })
+
+        setLoading(false);
+
+
+        if (response && response.error) {
+            toast(response.error)
+            return;
+        }
+
+        if (response && response.data) {
+            toast(response.data)
+        }
+        handleCloseModal();
+
     }
 
 
@@ -215,7 +245,7 @@ export function DialogService({ closeModal, initialValues, serviceId }: DialogSe
                         className="w-full font-semibold text-white"
                         disabled={loading}
                     >
-                        {loading ? "Cadastrando..." : `${serviceId ? "Salvar alterações" : "Cadastrar serviço"}`}
+                        {loading ? "Carregando..." : `${serviceId ? "Atualizar serviço" : "Cadastrar serviço"}`}
                     </Button>
 
                 </form>
