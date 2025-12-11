@@ -16,6 +16,6 @@ export default async function SchedulePage({
     }
 
     return (
-        <ScheduleContent />
+        <ScheduleContent clinic={user} />
     )
 }
