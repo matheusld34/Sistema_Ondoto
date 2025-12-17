@@ -3,7 +3,6 @@
 import Image from "next/image"
 import imgTest from '../../../../../../public/foto1.png'
 import { MapPin } from "lucide-react"
-import { Prisma } from "@prisma/client"
 import { useAppointmentForm, AppointmentFormData } from './schedule-form'
 import { Button } from '@/components/ui/button'
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form'
@@ -12,6 +11,7 @@ import { Input } from '@/components/ui/input'
 import { formatPhone } from '@/utils/formatPhone'
 import { DateTimePicker } from "./date-picker"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
+import { Prisma } from "@/generated/prisma/client"
 
 type UserWithServiceAndSubscription = Prisma.UserGetPayload<{
     include: {
@@ -28,6 +28,11 @@ interface ScheduleContentProps {
 export function ScheduleContent({ clinic }: ScheduleContentProps) {
 
     const form = useAppointmentForm();
+    const { watch } = form;
+
+    async function handleRegisterAppointment(formData: AppointmentFormData) {
+        console.log(formData);
+    }
 
     return (
         <div className="min-h-screen flex flex-col">
@@ -64,6 +69,7 @@ export function ScheduleContent({ clinic }: ScheduleContentProps) {
                 {/* Formulário de agendamento */}
                 <Form {...form}>
                     <form
+                        onSubmit={form.handleSubmit(handleRegisterAppointment)}
                         className="mx-2 space-y-6 bg-white p-6 border rounded-md shadow-sm"
                     >
 
@@ -171,6 +177,18 @@ export function ScheduleContent({ clinic }: ScheduleContentProps) {
                                 </FormItem>
                             )}
                         />
+
+                        {clinic.status ? (
+                            <Button
+                                type="submit"
+                                className="w-full bg-emerald-500 hover:bg-emerald-400"
+                                disabled={!form.watch("name") || !form.watch("email") || !form.watch("phone") || !form.watch("date")}
+                            >
+                                Realizar agendamento
+                            </Button>
+                        ) : (
+                            <p className="text-red-500 text-white text-center px-4 py-2 rounded-md">A clinica está fechada neste momento</p>
+                        )}
 
                     </form>
                 </Form>
