@@ -1,5 +1,5 @@
 "use client"
-
+import { useState } from "react"
 import Image from "next/image"
 import imgTest from '../../../../../../public/foto1.png'
 import { MapPin } from "lucide-react"
@@ -25,10 +25,22 @@ interface ScheduleContentProps {
     clinic: UserWithServiceAndSubscription
 }
 
+interface TimeSlot {
+    time: string;
+    available: boolean;
+}
+
 export function ScheduleContent({ clinic }: ScheduleContentProps) {
 
     const form = useAppointmentForm();
     const { watch } = form;
+    const [selectedTime, setSelectedTime] = useState("");
+    const [availableTimesSlots, setAvailableTimesSlots] = useState<TimeSlot[]>([]);
+    const [loandingSlots, setLoandingSlots] = useState(false);
+
+    const [blockedTimes, setBlockedTimes] = useState<string[]>([]);
+
+    //Função que busca horarios bloqueados (via Ferch HTTP)
 
     async function handleRegisterAppointment(formData: AppointmentFormData) {
         console.log(formData);
