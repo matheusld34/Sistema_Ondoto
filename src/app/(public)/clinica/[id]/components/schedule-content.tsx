@@ -34,22 +34,29 @@ export function ScheduleContent({ clinic }: ScheduleContentProps) {
 
     const form = useAppointmentForm();
     const { watch } = form;
-    const selectedDate = watch("date");
-    const selectedServiceId = watch("serviceId");
+
+
+    const selectedDate = watch("date")
+    const selectedServiceId = watch("serviceId")
+
     const [selectedTime, setSelectedTime] = useState("");
-    const [availableTimesSlots, setAvailableTimesSlots] = useState<TimeSlot[]>([]);
-    const [loandingSlots, setLoadingSlots] = useState(false);
+    const [availableTimeSlots, setAvailableTimeSlots] = useState<TimeSlot[]>([]);
+    const [loadingSlots, setLoadingSlots] = useState(false);
 
-    const [blockedTimes, setBlockedTimes] = useState<string[]>([]);
+    // Quais os horários bloqueados 01/02/2025 > ["15:00", "18:00"]
+    const [blockedTimes, setBlockedTimes] = useState<string[]>([])
 
+
+    // Função que busca os horários bloqueados (via Fetch HTTP)
     const fetchBlockedTimes = useCallback(async (date: Date): Promise<string[]> => {
         setLoadingSlots(true);
         try {
             const dateString = date.toISOString().split("T")[0]
             const response = await fetch(`${process.env.NEXT_PUBLIC_URL}/api/schedule/get-appointments?userId=${clinic.id}&date=${dateString}`)
 
-            return []
-
+            const json = await response.json();
+            setLoadingSlots(false);
+            return json; // Retornar o array com horarios que já tem bloqueado desse Dia e dessa clinica.
 
         } catch (err) {
             console.log(err)
@@ -70,8 +77,8 @@ export function ScheduleContent({ clinic }: ScheduleContentProps) {
     }, [selectedDate, clinic.times, fetchBlockedTimes, selectedTime])
 
 
-    async function handleRegisterAppointment(formData: AppointmentFormData) {
-        console.log(formData);
+    async function handleRegisterAppointmnent(formData: AppointmentFormData) {
+        console.log(formData)
     }
 
     return (
@@ -109,7 +116,7 @@ export function ScheduleContent({ clinic }: ScheduleContentProps) {
                 {/* Formulário de agendamento */}
                 <Form {...form}>
                     <form
-                        onSubmit={form.handleSubmit(handleRegisterAppointment)}
+                        onSubmit={form.handleSubmit(handleRegisterAppointmnent)}
                         className="mx-2 space-y-6 bg-white p-6 border rounded-md shadow-sm"
                     >
 
@@ -222,12 +229,14 @@ export function ScheduleContent({ clinic }: ScheduleContentProps) {
                             <Button
                                 type="submit"
                                 className="w-full bg-emerald-500 hover:bg-emerald-400"
-                                disabled={!form.watch("name") || !form.watch("email") || !form.watch("phone") || !form.watch("date")}
+                                disabled={!watch("name") || !watch("email") || !watch("phone") || !watch("date")}
                             >
                                 Realizar agendamento
                             </Button>
                         ) : (
-                            <p className="text-red-500 text-white text-center px-4 py-2 rounded-md">A clinica está fechada neste momento</p>
+                            <p className="bg-red-500 text-white text-center px-4 py-2 rounded-md">
+                                A clinica está fechada nesse momento.
+                            </p>
                         )}
 
                     </form>
