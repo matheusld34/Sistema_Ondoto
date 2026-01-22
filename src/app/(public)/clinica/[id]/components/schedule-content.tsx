@@ -72,7 +72,27 @@ export function ScheduleContent({ clinic }: ScheduleContentProps) {
 
         if (selectedDate) {
             fetchBlockedTimes(selectedDate).then((blocked) => {
-                console.log("Horarios reservados:", blocked)
+                setBlockedTimes(blocked)
+
+                const times = clinic.times || [];
+
+                const finalSlots = times.map((time) => ({
+                    time: time,
+                    available: !blocked.includes(time)
+                }))
+
+
+                setAvailableTimeSlots(finalSlots)
+
+                // Se o slot atual estiver indisponivel, limpamos a seleção
+                const stillAvailable = finalSlots.find(
+                    (slot) => slot.time === selectedTime && slot.available
+                )
+
+                if (!stillAvailable) {
+                    setSelectedTime("");
+                }
+
             })
         }
 
