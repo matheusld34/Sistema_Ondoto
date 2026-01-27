@@ -31,6 +31,12 @@ export function isSlotInThePast(slotTime: string) {
 }
 
 
+
+/** 
+  * Verificar se, a partir de um slot inicial, existe uma sequencia de 'requiredSlots' disponiveis
+  * Explo: se um serviço tem 2 required slots e começa no time 15:00,
+  * precisa garantir que 15:00 e 15:30 não estejam no nosso blockedSlots
+ */
 export function isSlotSequenceAvailable(
     startSlot: string, //> Primeiro horario disponivel
     requiredSlots: number, //> Quantidade de slots necessários
